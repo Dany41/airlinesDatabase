@@ -435,6 +435,9 @@ INSERT INTO Orders
 	('OR32','95644.6','T1258','OP3','EM1','2020-08-07','не оплачено','FR7759','2020-12-08T11:30:00','FR7760','2020-12-16T11:30:00'),
 	('OR33','17853.3','T1596','OP2','EM5','2020-08-09','скасовано','AE4465','2020-11-08T12:30:00','AE4466','2020-11-19T12:30:00'),
 	('OR34','16964.4','T1478','OP1','EM6','2020-08-15','не оплачено','PGT1660','2020-12-08T12:30:00','PGT1661','2020-12-12T12:30:00')
+('OR35','16964.4','T1478','OP3','EM1','2020-08-15','не оплачено','PGT1660','2020-12-08T12:30:00','PGT1661','2020-12-12T12:30:00'),
+        ('OR36','95644.6','T1478','OP1','EM5','2020-08-15','оплачено','QAA126','2020-11-10T10:10:00','QAA127','2020-11-15T10:10:00'),
+        ('OR37','16964.4', 'T1258','OP4','EM4','2020-08-15','оплачено','PGT1660','2020-12-08T12:30:00','PGT1661','2020-12-12T12:30:00')				     
 SELECT * FROM Orders
 
 INSERT INTO InterTable
@@ -497,5 +500,138 @@ INSERT INTO InterTable
 		      ('OR33','125.3','I17935'),
 	       ('OR34','125.12','I17935'),
 		      ('OR34','125.13','I17935')
+	 ('OR35','125.18','I12569'),
+('OR35','125.19','I12569'),
+('OR35','125.20','I12569'),
+('OR36','125.9','I25469'),
+('OR37','125.4','I12569'),
+('OR37','125.5','I12569')
 SELECT * FROM InterTable
  
+1) SELECT flight_number_to as 'Номер рейсу', date_to as 'Дата вильоту'
+    FROM dbo.Flight_to
+    WHERE direction = 'Львів-Стамбул'    /* Пошук номерів рейсів та дат вильотів з таблиці Flight_to, де напрмяок 'Львів-Стамбул' */
+
+
+2) SELECT insurance_company as 'Страхова компанія', risk  as 'Вид страхування'
+   FROM dbo.Insurance
+   WHERE  insurance_company= 'PZU' AND insurance_duration = '6' /* Вибрати Страхові компанії та види страхувань з таблиці Insurance, за умови назви компанії PZU та терміна страхування 6 місяців  */
+
+
+3) SELECT insurance_company as 'Страхова компанія', risk  as 'Вид страхування'
+    FROM dbo.Insurance
+    WHERE NOT insurance_duration = '6' /* Вибрати Страхові компанії та види страхувань з таблиці Insurance, за умови що термін стахування не буде 6 місяців  */
+
+
+4) SELECT traveller_surname as 'Страхова компанія', traveller_name   as 'Вид страхування',traveller_tel_numb as 'Номер телефону'
+    FROM dbo.Travellers
+    WHERE traveller_tel_numb LIKE '+380%'   /*Вибрати Імена та Прізвища подорожуючих з таблиці Travellers, в яких номер телефону починається з "+380" */
+
+
+5) SELECT id_order as 'ID замовлення',  order_status as 'Статус замовлення',
+    (SELECT tour_status as 'Статус тура'
+     FROM  dbo.Tours as T 
+    WHERE T.id_tour=O.id_tour)
+    FROM dbo.Orders as O  /* Вибрати ID замовлень та Статус замовлення з таблиці Orders та вибрати  Статус тура з таблиці Tours,
+	                         при умові щоб id_tour співпадало в обох таблицях  */
+
+
+6)  SELECT employee_surname as 'Прізвище працівника', employee_name as 'Ім^я працівника'
+     FROM dbo.Employees
+     GROUP BY employee_name, employee_surname     /*Вибрати прізвища та імена працівників з таблиці Employees та погрупувати за Іменами*/
+
+
+ 7)  SELECT COUNT (Orders.id_order) AS 'Кількість замовлень', order_status as 'Статус замовлення'
+      FROM dbo.Orders
+      GROUP BY order_status  /* з Таблиці Orders порахувати кількість замовлень, погрупувавши за Статусом замовлень */
+ 
+8)   SELECT id_tour as 'ID тура'
+      FROM dbo.Orders
+      GROUP BY  id_tour
+      HAVING COUNT(*)>3   /* З таблиці Orders вибрати ті ID турів, які замовлялись більше 3 разів */
+
+9)	  SELECT id_client as 'ID клієнта'
+      FROM dbo.Orders
+      GROUP BY  id_client
+      HAVING COUNT(*)<3    /* З таблиці Orders вибрати ті ID клієнтів, які замовляли менше 3 разів */
+
+10)    SELECT traveller_surname as 'Прізвище'
+       FROM dbo.Travellers
+       GROUP BY traveller_surname
+       HAVING traveller_surname LIKE 'С%' OR traveller_surname LIKE 'S%' 
+	   /*Вибрати прізвища подорожуючих з таблиці Travellers, які починаються з букви С та S  */
+
+11)   SELECT id_tour as 'ID тура',  name_hotel as 'Назва готелю', type_nutrition as 'Тип харчування'
+        FROM dbo.Tours as T, dbo.Hotels as H, dbo.Nutrition as N
+       WHERE T.id_hotel=H.id_hotel AND T.id_nutrition=N.id_nutrition
+	    
+		/* Поєднати три таблиці (Tours,Hotels та Nutrition), вибравши з них такі дані: 
+		   ID тура, Назва готелю та Тип харчування, щоб id_hotel співпадало в таблицях Tours,Hotels,
+		   а id_nutrition - в талицях Tours та Nutrition */
+
+12)  SELECT COUNT (Orders.id_client) AS 'Кількість клієнтів', id_tour as 'ID тура'
+       FROM dbo.Orders
+       GROUP BY id_tour
+	   /* Порахувати кількість клієнтів з таблиці Orders, які замовляли певні тури */
+
+
+13)    SELECT COUNT (Clients.id_client) as 'Загальна кількість клієнтів'
+    FROM dbo.Clients
+    /* Знайти сумарну кількість клієнтів туристичної фірми */
+
+
+14)  SELECT sum(salary) as 'Фонд оплати праці'
+     FROM dbo.Employees
+		  /* Загальна сума виплати працівникам */
+
+15) SELECT id_client as 'ID клієнта', order_date as 'Дата', order_status as 'Статус замовлення'
+    FROM dbo.Orders
+    WHERE id_client ='12565.1' AND YEAR(order_date) = '2020' 
+	/*Список заказів певного клієнта за 2020 рік*/ 
+
+16) SELECT COUNT(Orders.id_order) as 'Кількість замовлень'
+    FROM dbo.Orders
+    WHERE  YEAR(order_date) = '2020' 
+	/*Кількість замовлень  за 2020 рік*/ 
+
+
+17 ) SELECT Hotels.name_hotel as 'Назва готелю' , Country.name_country as 'Країна', Hotels.stars as 'Кількість зірок '
+     From Hotels
+     Inner join Country on country.id_country=Hotels.id_country
+     GROUP BY  stars, name_hotel,name_country
+    /* Показати наявні готелі з вказаною назвою краіни та кількістю зірок */
+
+
+18)  SELECT AVG(Employees.salary) as 'Середня заробітня плата'
+     From dbo.Employees
+    /* Порахувати середню зарплату */
+
+
+19) Select id_client as 'ID клієнта', COUNT (Orders.id_order) as ' Кількість замовлень '
+    FROM dbo.Orders
+    Group by id_client
+    Having COUNT(Orders.id_order) >= 3
+	/*Показати список клієнтів в якиз 3 або більше замовлень*/
+
+20)  SELECT T.id_tour as 'ID тура', Nutrition.type_nutrition as 'Тип харчування '
+     From dbo.Tours as T
+     Inner join Nutrition on Nutrition.id_nutrition=T.id_nutrition
+	 WHERE type_nutrition LIKE 'напівпансіон'
+     /* Показати список турів, в яких тип харчування напівпансіон*/
+
+21) SELECT *
+   FROM dbo.Nutrition
+   WHERE type_nutrition LIKE 'все включено'
+   /*Показати ID харчування з типом харчування Все включено */
+
+
+22)  SELECT DISTINCT name_hotel,
+     CASE 
+     WHEN (stars<=3) THEN  'Задовільно'
+     WHEN (stars>3) THEN 'Добре'
+     WHEN (stars>4) THEN 'Дуже добре'
+     ELSE NULL
+      END rating 
+     FROM dbo.Hotels 
+
+      /* Провести ранжування готелів за оцінкою, сортування назви готелю по алфавіту*/

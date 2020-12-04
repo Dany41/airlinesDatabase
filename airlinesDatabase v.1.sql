@@ -635,3 +635,21 @@ SELECT * FROM InterTable
      FROM dbo.Hotels 
 
       /* Провести ранжування готелів за оцінкою, сортування назви готелю по алфавіту*/
+
+     
+ 23 )Select traveller_name as 'Ім^я подорожуючого', traveller_tel_numb as 'Номер телефону' ,traveller_date_birth as 'Дата дня народження'
+    From Travellers
+    Where month(traveller_date_birth) = month(getdate())
+    /* клієнти в яких в цьому місяці день народження */
+
+24) Select * 
+    FROM dbo.Travellers
+      WHERE traveller_tel_numb LIKE '+38067%'OR traveller_tel_numb LIKE '+38068%' OR traveller_tel_numb LIKE '+38098%' OR traveller_tel_numb LIKE '+38097%'
+
+ /*Вибрати подорожуючих з таблиці Travellers, які користуються мобільним оператором киівстар*/
+
+ 25) Select * 
+     FROM  dbo.Travellers
+     Where traveller_name = 'Дмитро' OR traveller_name ='Діма'
+/* інформація про тревелерів з ім‘ям Діма, наприклад, щоб привітати з іменинами */   
+     
